@@ -44,12 +44,18 @@ class ResourceSerializer(NonNullModelSerializer):
         ]
 
 
+def export_child_resources(resource):
+    resources = [ResourceSerializer(resource).data]
+    for r in Resource.objects.filter(parent_resource=resource):
+        resources.extend(export_child_resources(r))
+
+    return resources
+
+
 def export_resources():
     resources = []
     for r in Resource.objects.filter(parent_resource__isnull=True):
-        resources.append(ResourceSerializer(r).data)
-    for r in Resource.objects.filter(parent_resource__isnull=False):
-        resources.append(ResourceSerializer(r).data)
+        resources.extend(export_child_resources(r))
 
     return YAMLRenderer().render(resources)
 

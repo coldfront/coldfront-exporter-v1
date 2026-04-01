@@ -61,7 +61,7 @@ class ProjectSerializer(NonNullModelSerializer):
 
 def export_projects():
     projects = []
-    for p in Project.objects.all():
+    for p in Project.objects.filter(status__name="Active"):
         projects.append(ProjectSerializer(p).data)
 
     return YAMLRenderer().render(projects)

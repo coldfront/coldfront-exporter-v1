@@ -50,7 +50,8 @@ class AllocationSerializer(NonNullModelSerializer):
         source="project.pi.username",
     )
     attribute_data = AttributeDataField(
-        source="*", attribute_names=["slurm_specs", "slurm_user_specs"]
+        source="*",
+        attribute_names=["slurm_specs", "slurm_user_specs", "slurm_account_name"],
     )
 
     class Meta:
@@ -71,7 +72,7 @@ class AllocationSerializer(NonNullModelSerializer):
 
 def export_allocations():
     allocations = []
-    for a in Allocation.objects.all():
+    for a in Allocation.objects.filter(project__status__name="Active"):
         allocations.append(AllocationSerializer(a).data)
 
     return YAMLRenderer().render(allocations)
